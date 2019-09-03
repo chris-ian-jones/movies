@@ -2,6 +2,10 @@ const express = require('express')
 
 const server = express()
 
+server.use(express.json())
+let movieId = 5
+let actorId = 3
+
 let actors = [
   {
     id: 1,
@@ -52,7 +56,31 @@ server.get('/api/movies', (req, res) => {
 })
 
 server.get('/api/actors', (req, res) => {
-  res.status(200).json(actors)
+  const minRating = req.query.minrating
+
+  let result = [...movies]
+
+  if(minRating) {
+    result = movies.filter(movie => movie.rating >= minRating)
+  }
+  res.status(200).json(result)
+})
+
+server.post('/api/movies', (req, res) => {
+  const movie = req.body
+  
+  movie.id = movieId++
+  movies.push(movie)
+
+  res.status(201).json(movies)
+})
+
+server.delete('/api/movies/:id', (req, res) => {
+  const id = req.params.id
+
+  movies = movies.filter(movie => movie.id !== Number(id))
+
+  res.status(200).json(movies)
 })
 
 module.exports = server
